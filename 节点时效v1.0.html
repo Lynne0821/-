@@ -400,6 +400,9 @@
               <option>提货时间</option>
               <option>开船/起飞时间</option>
               <option>到港/落地时间</option>
+              <option>清关放行</option>
+              <option>提柜</option>
+              <option>派送/签收</option>
             </select>
             <input type="text" class="wide" placeholder="开始日期 ~ 结束日期" style="width: 180px;">
           </div>
@@ -424,6 +427,7 @@
 
       <!-- 操作按钮区 -->
       <div class="action-area">
+        <button class="btn btn-default" onclick="openUploadModal()">批量上传文件</button>
         <button class="btn btn-default">导出DL明细</button>
         <button class="btn btn-primary">导入物流追踪轨迹</button>
       </div>
@@ -607,6 +611,37 @@
     </div>
   </div>
 
+  <!-- 批量上传文件弹窗 -->
+  <div class="modal-overlay" id="uploadModal">
+    <div class="modal" style="width: 400px; border-radius: 2px;">
+      <div class="modal-header" style="border-bottom: none; padding: 16px 20px 8px;">
+        <span style="font-weight: normal; font-size: 16px; color: #303133;">批量上传文件</span>
+        <span class="modal-close" style="font-size: 16px;" onclick="closeUploadModal()">×</span>
+      </div>
+      <div class="modal-body" style="padding: 12px 20px 24px;">
+        
+        <div class="form-item" style="align-items: center; margin-bottom: 16px;">
+          <div style="color: #606266; margin-right: 12px; font-size: 13px;">文件类型:</div>
+          <div class="form-content" style="flex: none; width: 140px;">
+            <select style="height: 28px; border-radius: 2px; color: #606266; font-size: 13px;">
+              <option>运输提单</option>
+            </select>
+          </div>
+        </div>
+        
+        <div style="color: #606266; margin-bottom: 16px; font-size: 13px;">请先上传文件，再确认上传</div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <button class="btn btn-primary" style="background-color: #3f9eff; border-color: #3f9eff; height: 32px; padding: 0 20px; border-radius: 2px; font-size: 13px;">上传文件</button>
+          <button class="btn btn-primary" style="background-color: #a0cfff; border-color: #a0cfff; height: 32px; padding: 0 20px; border-radius: 2px; font-size: 13px; cursor: not-allowed;">确认上传</button>
+        </div>
+
+        <div style="color: #909399; font-size: 12px; margin-top: 16px; line-height: 1.5;">提示：按照DL命名自动识别，多个DL一个文件请用,或-或/隔开</div>
+
+      </div>
+    </div>
+  </div>
+
   <script>
     // 模拟当前时间，用于判断未填写的节点是否已经超时
     const SIMULATED_TODAY = new Date('2026-05-18').getTime();
@@ -717,6 +752,23 @@
     modal.addEventListener('click', function(e) {
       if (e.target === modal) {
         closeModal();
+      }
+    });
+
+    // 批量上传文件弹窗逻辑
+    const uploadModal = document.getElementById('uploadModal');
+
+    function openUploadModal() {
+      uploadModal.style.display = 'flex';
+    }
+
+    function closeUploadModal() {
+      uploadModal.style.display = 'none';
+    }
+
+    uploadModal.addEventListener('click', function(e) {
+      if (e.target === uploadModal) {
+        closeUploadModal();
       }
     });
 
