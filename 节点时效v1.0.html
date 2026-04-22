@@ -133,10 +133,6 @@
       display: flex;
       align-items: center;
     }
-    .search-item label {
-      margin-right: 8px;
-      color: #606266;
-    }
     .search-item input, .search-item select {
       height: 32px;
       border: 1px solid #dcdfe6;
@@ -400,8 +396,8 @@
       <div class="search-area">
         <div class="search-left">
           <div class="search-item">
-            <label>节点时间</label>
             <select style="width: 100px; margin-right: 8px;">
+              <option>节点时间</option>
               <option>提货时间</option>
               <option>开船/起飞时间</option>
               <option>到港/落地时间</option>
@@ -412,21 +408,17 @@
             <input type="text" class="wide" placeholder="开始日期 ~ 结束日期" style="width: 180px;">
           </div>
           <div class="search-item">
-            <label>目的国</label>
-            <select><option>请选择</option></select>
+            <select><option>目的国</option></select>
           </div>
           <div class="search-item">
-            <label>运输方式</label>
-            <select><option>请选择</option></select>
+            <select><option>运输方式</option></select>
           </div>
           <div class="search-item">
-            <label>批次号</label>
-            <input type="text" class="wide" placeholder="批量查询以逗号、空格或换行隔开">
+            <input type="text" class="wide" placeholder="批次号(多条搜索以,或空格隔开)">
           </div>
           <div class="search-item">
-            <label>附件资料</label>
             <select style="width: 100px; margin-right: 8px;">
-              <option>全部类型</option>
+              <option>附件资料</option>
               <option>运输提单</option>
               <option>报关底单</option>
               <option>税金单</option>
