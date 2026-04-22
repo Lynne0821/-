@@ -395,8 +395,13 @@
       <div class="search-area">
         <div class="search-left">
           <div class="search-item">
-            <label>承运商</label>
-            <select><option>请选择</option></select>
+            <label>节点时间</label>
+            <select style="width: 100px; margin-right: 8px;">
+              <option>提货时间</option>
+              <option>开船/起飞时间</option>
+              <option>到港/落地时间</option>
+            </select>
+            <input type="text" class="wide" placeholder="开始日期 ~ 结束日期" style="width: 180px;">
           </div>
           <div class="search-item">
             <label>目的国</label>
@@ -432,15 +437,13 @@
               <th>DL号</th>
               <th>目的国</th>
               <th>运输方式</th>
-              <th>截单(系统)</th>
               <th>提货(系统)</th>
-              <th>出口报关放行</th>
+              <th>出口报关放行(系统)</th>
               <th>开船/起飞</th>
               <th>到港/落地</th>
               <th>清关放行</th>
               <th>提柜</th>
               <th>派送/签收</th>
-              <th>上架</th>
               <th>操作</th> <!-- 新增操作列 -->
             </tr>
           </thead>
@@ -652,41 +655,38 @@
 
       // 生成 DOM
       ruleChain.forEach(step => {
+        if (step.key === "cut" || step.key === "shelf") return;
         const td = document.createElement('td');
         const actualVal = rawData[step.key];
         const theoryVal = theoryDateMap[step.key];
 
-        if (step.key === "cut") {
-          td.textContent = actualVal; // 截单作为起点不标异常
+        let isError = false;
+        
+        if (actualVal) {
+          // 情况1：有实际时间，但晚于理论时间
+          if (theoryVal && new Date(actualVal).getTime() > new Date(theoryVal).getTime()) {
+            isError = true;
+          }
         } else {
-          let isError = false;
-          
-          if (actualVal) {
-            // 情况1：有实际时间，但晚于理论时间
-            if (theoryVal && new Date(actualVal).getTime() > new Date(theoryVal).getTime()) {
-              isError = true;
-            }
-          } else {
-            // 情况2：无实际时间（未维护），但当前时间已经超出了理论时间
-            if (theoryVal && SIMULATED_TODAY > new Date(theoryVal).getTime()) {
-              isError = true;
-            }
+          // 情况2：无实际时间（未维护），但当前时间已经超出了理论时间
+          if (theoryVal && SIMULATED_TODAY > new Date(theoryVal).getTime()) {
+            isError = true;
           }
+        }
 
-          if (isError) {
-            td.innerHTML = `
-              <div class="status-error">
-                <div>${actualVal ? actualVal : '未维护'}</div>
-                <div class="theory-time">理论应: ${theoryVal}</div>
-              </div>
-            `;
-          } else {
-            // 正常显示
-            td.innerHTML = `
-              <div>${actualVal ? actualVal : '-'}</div>
-              ${theoryVal && !actualVal ? `<div class="theory-time">预计: ${theoryVal}</div>` : ''}
-            `;
-          }
+        if (isError) {
+          td.innerHTML = `
+            <div class="status-error">
+              <div>${actualVal ? actualVal : '未维护'}</div>
+              <div class="theory-time">理论应: ${theoryVal}</div>
+            </div>
+          `;
+        } else {
+          // 正常显示
+          td.innerHTML = `
+            <div>${actualVal ? actualVal : '-'}</div>
+            ${theoryVal && !actualVal ? `<div class="theory-time">预计: ${theoryVal}</div>` : ''}
+          `;
         }
         tr.appendChild(td);
       });
