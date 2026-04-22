@@ -171,11 +171,15 @@
     .btn-default { background-color: #fff; color: #606266; border-color: #dcdfe6; }
     .btn-default:hover { border-color: #3875f6; color: #3875f6; }
 
-    /* 操作按钮区 (右侧) */
+    /* 操作按钮区 */
     .action-area {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 12px;
+    }
+    .action-right {
+      display: flex;
       gap: 10px;
     }
 
@@ -444,9 +448,12 @@
 
       <!-- 操作按钮区 -->
       <div class="action-area">
-        <button class="btn btn-default" onclick="openUploadModal()">批量上传文件</button>
-        <button class="btn btn-default">导出DL明细</button>
-        <button class="btn btn-primary">导入物流追踪轨迹</button>
+        <div style="color: #f56c6c; font-size: 13px;">说明：请每天中午12点前完成在途DL跟踪节点信息</div>
+        <div class="action-right">
+          <button class="btn btn-default" onclick="openUploadModal()">批量上传文件</button>
+          <button class="btn btn-default">导出DL明细</button>
+          <button class="btn btn-primary">导入物流追踪轨迹</button>
+        </div>
       </div>
 
       <!-- 数据表格区 -->
