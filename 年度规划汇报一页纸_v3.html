@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务系统年度规划 v2.0</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f0f4f8;
+    color: #1e293b;
+    padding: 32px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  /* ── 顶部标题区 ── */
+  .header {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%);
+    color: #fff;
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left h1 { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+  .header-left p  { font-size: 13px; opacity: .8; margin-top: 4px; }
+  .header-right {
+    background: rgba(255,255,255,.15);
+    border-radius: 10px;
+    padding: 10px 20px;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .version-badge {
+    background: rgba(255,255,255,.9);
+    color: #1d4ed8;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .header-right .motto { font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+  .header-right .motto span {
+    margin: 0 4px; padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.25);
+  }
+
+  .body { padding: 24px 40px 32px; }
+
+  /* ── 主内容区 ── */
+  .row-main {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .card {
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid #e2e8f0;
+  }
+  .card-title {
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: #94a3b8; margin-bottom: 10px;
+  }
+  .left-col { display: flex; flex-direction: column; gap: 14px; }
+
+  .done-list li, .problem-list li {
+    list-style: none; padding: 5px 0;
+    border-bottom: 1px dashed #f1f5f9;
+    font-size: 13px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .done-list li:last-child, .problem-list li:last-child { border-bottom: none; }
+  .done-list li::before   { content: "✓"; color: #10b981; font-weight: 700; flex-shrink: 0; }
+  .problem-list li::before{ content: "!"; color: #f59e0b; font-weight: 700; flex-shrink: 0; }
+
+  /* ── 三步主线 ── */
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+  .step {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid #e2e8f0;
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+  }
+  .step-head {
+    padding: 14px 16px; color: #fff;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .step-head .seq  { font-size: 10px; font-weight: 700; opacity: .75; letter-spacing: 1px; }
+  .step-head .name { font-size: 16px; font-weight: 800; margin: 3px 0 1px; }
+  .step-head .tag  { font-size: 11px; opacity: .85; }
+  .step-body, .step-gain {
+    padding: 12px 14px; font-size: 12.5px;
+    border-left: 1px solid #f1f5f9;
+  }
+  .step-body { background: #fafafa; }
+  .step-gain { background: #fff; }
+  .sub-label {
+    font-size: 10px; font-weight: 700; color: #94a3b8;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .step-body ul, .step-gain ul { list-style: none; }
+  .step-body li, .step-gain li {
+    padding: 2px 0; padding-left: 12px;
+    position: relative; color: #374151;
+  }
+  .step-body li::before {
+    content: "·"; position: absolute; left: 2px;
+    color: #9ca3af; font-size: 16px; line-height: 1; top: 3px;
+  }
+  .step-gain li::before {
+    content: "↑"; position: absolute; left: 0;
+    color: #10b981; font-weight: 700; font-size: 11px; top: 4px;
+  }
+  .step-motto {
+    font-size: 11px; font-weight: 700; margin-top: 8px;
+    padding: 5px 8px; border-radius: 6px; text-align: center;
+  }
+  .s1 .step-head { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+  .s1 .step-motto { background: #eff6ff; color: #1d4ed8; }
+  .s2 .step-head { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+  .s2 .step-motto { background: #f0fdfa; color: #0f766e; }
+  .s3 .step-head { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+  .s3 .step-motto { background: #f5f3ff; color: #6d28d9; }
+
+  /* ── 底部价值 + 结论 ── */
+  .row-bottom {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 18px; margin-top: 4px;
+  }
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .value-item {
+    background: #f8fafc; border-radius: 8px;
+    padding: 12px; border: 1px solid #e2e8f0;
+  }
+  .value-item .vi-icon { font-size: 20px; margin-bottom: 5px; }
+  .value-item .vi-who  { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; }
+  .value-item .vi-pts  { list-style: none; }
+  .value-item .vi-pts li {
+    font-size: 12px; color: #374151; padding: 2px 0;
+    padding-left: 11px; position: relative;
+  }
+  .value-item .vi-pts li::before {
+    content: "·"; position: absolute; left: 0;
+    color: #cbd5e1; font-size: 16px; line-height: 1; top: 2px;
+  }
+  .conclusion {
+    background: linear-gradient(160deg, #1e3a8a 0%, #1d4ed8 100%);
+    border-radius: 10px; padding: 20px;
+    color: #fff; display: flex; flex-direction: column; justify-content: center;
+  }
+  .conclusion .c-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    opacity: .65; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .conclusion .c-steps { list-style: none; }
+  .conclusion .c-steps li {
+    padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.12);
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+  }
+  .conclusion .c-steps li:last-child { border-bottom: none; }
+  .conclusion .badge {
+    display: inline-block; width: 22px; height: 22px;
+    border-radius: 50%; background: rgba(255,255,255,.2);
+    font-size: 11px; font-weight: 800; text-align: center;
+    line-height: 22px; flex-shrink: 0;
+  }
+  .conclusion .c-final {
+    margin-top: 12px; background: rgba(255,255,255,.12);
+    border-radius: 8px; padding: 8px 12px;
+    font-size: 12px; font-weight: 700; text-align: center; letter-spacing: 1px;
+  }
+
+  /* ══════════════════════════════════
+     菜单规划区块
+  ══════════════════════════════════ */
+  .menu-section {
+    margin-top: 28px;
+    border-top: 2px solid #e2e8f0;
+    padding-top: 22px;
+  }
+  .menu-section-title {
+    font-size: 14px; font-weight: 800; color: #1e293b;
+    margin-bottom: 4px; letter-spacing: 0.5px;
+  }
+  .menu-section-sub {
+    font-size: 12px; color: #94a3b8; margin-bottom: 14px;
+  }
+
+  /* 图例 + 切换按钮 */
+  .legend {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 16px; align-items: center;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: #475569;
+  }
+  .leg-dot {
+    width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+  }
+  .leg-existing { background: #64748b; }
+  .leg-v5       { background: #2563eb; }
+  .leg-v6       { background: #0d9488; }
+  .leg-v7       { background: #7c3aed; }
+
+  /* 切换按钮 */
+  .toggle-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    border: 2px solid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    position: relative;
+    outline: none;
+    background: #fff;
+  }
+  .toggle-btn .btn-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    transition: background 0.2s;
+  }
+
+  /* V5.0 按钮 */
+  .toggle-btn.btn-v5 {
+    border-color: #2563eb; color: #2563eb;
+  }
+  .toggle-btn.btn-v5 .btn-dot { background: #2563eb; }
+  .toggle-btn.btn-v5.off {
+    background: #f8fafc; color: #94a3b8; border-color: #e2e8f0;
+    text-decoration: line-through;
+  }
+  .toggle-btn.btn-v5.off .btn-dot { background: #cbd5e1; }
+
+  /* V6.0 按钮 */
+  .toggle-btn.btn-v6 {
+    border-color: #0d9488; color: #0d9488;
+  }
+  .toggle-btn.btn-v6 .btn-dot { background: #0d9488; }
+  .toggle-btn.btn-v6.off {
+    background: #f8fafc; color: #94a3b8; border-color: #e2e8f0;
+    text-decoration: line-through;
+  }
+  .toggle-btn.btn-v6.off .btn-dot { background: #cbd5e1; }
+
+  /* V7.0 按钮 */
+  .toggle-btn.btn-v7 {
+    border-color: #7c3aed; color: #7c3aed;
+  }
+  .toggle-btn.btn-v7 .btn-dot { background: #7c3aed; }
+  .toggle-btn.btn-v7.off {
+    background: #f8fafc; color: #94a3b8; border-color: #e2e8f0;
+    text-decoration: line-through;
+  }
+  .toggle-btn.btn-v7.off .btn-dot { background: #cbd5e1; }
+
+  /* 菜单网格 */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+  }
+  .menu-col-header {
+    font-size: 11px; font-weight: 800;
+    color: #334155; letter-spacing: 0.5px;
+    background: #f1f5f9;
+    padding: 6px 10px; border-radius: 6px;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .menu-col-sub {
+    font-size: 10px; color: #64748b;
+    text-align: center;
+    margin-bottom: 8px;
+    margin-top: -2px;
+    line-height: 1.4;
+  }
+  .menu-items { display: flex; flex-direction: column; gap: 5px; }
+  /* 子分组标签 */
+  .menu-sub-grp {
+    font-size: 10px; font-weight: 700;
+    color: #94a3b8;
+    margin-top: 10px;
+    margin-bottom: -1px;
+    padding-left: 2px;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+  .menu-sub-grp:first-child { margin-top: 0; }
+
+  /* 菜单标签 */
+  .menu-tag {
+    font-size: 11.5px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    line-height: 1.3;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    overflow: hidden;
+  }
+
+  /* 已有 */
+  .t-existing {
+    background: #f1f5f9; color: #334155;
+    border: 1px solid #cbd5e1;
+  }
+  /* V5.0 新增 */
+  .t-v5 {
+    background: #eff6ff; color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+  }
+  /* V6.0 新增 */
+  .t-v6 {
+    background: #f0fdfa; color: #0f766e;
+    border: 1px solid #99f6e4;
+  }
+  /* V7.0 新增 */
+  .t-v7 {
+    background: #f5f3ff; color: #6d28d9;
+    border: 1px solid #ddd6fe;
+  }
+
+  /* 隐藏动效：缩合折叠 */
+  .menu-tag.hidden {
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    opacity: 0;
+    border-width: 0;
+    pointer-events: none;
+  }
+  .menu-tag {
+    max-height: 80px;
+    opacity: 1;
+  }
+
+  /* ── 底部脚注 ── */
+  .footer {
+    border-top: 1px solid #f1f5f9;
+    margin-top: 24px; padding-top: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: #94a3b8;
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 顶部标题 -->
+  <div class="header">
+    <div class="header-left">
+      <h1>财务系统年度建设规划</h1>
+      <p>在已有底座上继续升级 · 分三步走 · 优先提效 → 控险 → 赋能经营</p>
+    </div>
+    <div class="header-right">
+      <div class="version-badge">v2.0</div>
+      <div class="motto">
+        <span>先提效</span>→<span>再控险</span>→<span>赋能经营</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- 主内容区：左+右 -->
+    <div class="row-main">
+      <div class="left-col">
+        <div class="card">
+          <div class="card-title">✅ 前四期已经做了什么</div>
+          <ul class="done-list">
+            <li>多渠道数据接入（Amazon / 独立站 / TikTok 等）</li>
+            <li>基础利润核算与多渠道看板</li>
+            <li>头程成本移动平均法自动分摊</li>
+            <li>智能会计引擎，金蝶凭证自动化推送（进行中）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠️ 当前仍未解决的问题</div>
+          <ul class="problem-list">
+            <li>财务仍有大量月结手工工作</li>
+            <li>业务 / 财务数据口径存在差异</li>
+            <li>海外资金池不透明，账龄和核销缺少系统化</li>
+            <li>营销费用事后入账，无事前预算控制</li>
+            <li>财务支持停留在月度复盘，未进入经营现场</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="steps">
+        <!-- V5.0 -->
+        <div class="step s1">
+          <div class="step-head">
+            <div class="seq">V5.0 · 优先级 P0</div>
+            <div class="name">财务提效</div>
+            <div class="name" style="font-size:13px;margin:0;">核算标准化</div>
+            <div class="tag" style="margin-top:5px;">先把手工活替掉</div>
+          </div>
+          <div class="step-body">
+            <div class="sub-label">重点建设</div>
+            <ul>
+              <li>业财主数据映射规则中心</li>
+              <li>业财差异自动对账台账</li>
+              <li>营销推广 / 品牌等综合费用维度溯源与分摊</li>
+              <li>渠道退货率追溯分析（按渠道/SKU/时段归因退货损失）</li>
+              <li>全渠道利润口径统一</li>
+            </ul>
+          </div>
+          <div class="step-gain">
+            <div class="sub-label">核心收益</div>
+            <ul>
+              <li>月结和对数工作量下降</li>
+              <li>跨部门数据打架问题消除</li>
+              <li>管理层看到统一可信的数据</li>
+            </ul>
+            <div class="step-motto">先把财务团队从重复劳动里解放出来</div>
+          </div>
+        </div>
+
+        <!-- V6.0 -->
+        <div class="step s2">
+          <div class="step-head">
+            <div class="seq">V6.0 · 优先级 P1</div>
+            <div class="name">资金透明</div>
+            <div class="name" style="font-size:13px;margin:0;">风险收口</div>
+            <div class="tag" style="margin-top:5px;">把钱看清楚</div>
+          </div>
+          <div class="step-body">
+            <div class="sub-label">重点建设</div>
+            <ul>
+              <li>海外资金池对账与核销</li>
+              <li>PayPal / 三方支付流水台账</li>
+              <li>应收账龄分析与坏账预警</li>
+              <li>暂估 / 计提 / 冲回工作流</li>
+              <li>资金核销台账与对账引擎</li>
+            </ul>
+          </div>
+          <div class="step-gain">
+            <div class="sub-label">核心收益</div>
+            <ul>
+              <li>降低资金不透明和漏损风险</li>
+              <li>利润真实性显著提升</li>
+              <li>现金流更可控、风险更可见</li>
+            </ul>
+            <div class="step-motto">让利润不只在报表上，更在账户里</div>
+          </div>
+        </div>
+
+        <!-- V7.0 -->
+        <div class="step s3">
+          <div class="step-head">
+            <div class="seq">V7.0 · 优先级 P2</div>
+            <div class="name">预算前置</div>
+            <div class="name" style="font-size:13px;margin:0;">经营赋能</div>
+            <div class="tag" style="margin-top:5px;">进入经营现场</div>
+          </div>
+          <div class="step-body">
+            <div class="sub-label">重点建设</div>
+            <ul>
+              <li>营销 / GTM 费用业财直连</li>
+              <li>预算编制、执行、预警、差异分析</li>
+              <li>每日经营动态驾驶舱</li>
+              <li>利润异常自动归因与预警</li>
+            </ul>
+          </div>
+          <div class="step-gain">
+            <div class="sub-label">核心收益</div>
+            <ul>
+              <li>超预算行为更早暴露拦截</li>
+              <li>营销费用归因更清楚</li>
+              <li>管理层更早看到经营变化</li>
+            </ul>
+            <div class="step-motto">让财务真正进入经营现场</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部：价值 + 结论 -->
+    <div class="row-bottom">
+      <div class="card">
+        <div class="card-title">📊 这份规划对公司的三层价值</div>
+        <div class="value-grid">
+          <div class="value-item">
+            <div class="vi-icon">👩‍💼</div>
+            <div class="vi-who">对 财务团队</div>
+            <ul class="vi-pts">
+              <li>大幅减少重复性手工劳动</li>
+              <li>月结效率显著提升</li>
+              <li>核算数据更标准可信</li>
+            </ul>
+          </div>
+          <div class="value-item">
+            <div class="vi-icon">📈</div>
+            <div class="vi-who">对 管理层</div>
+            <ul class="vi-pts">
+              <li>更快看到更可信的数据</li>
+              <li>更早发现资金和经营风险</li>
+              <li>清楚判断哪条线在赚钱</li>
+            </ul>
+          </div>
+          <div class="value-item">
+            <div class="vi-icon">🏢</div>
+            <div class="vi-who">对 公司经营</div>
+            <ul class="vi-pts">
+              <li>利润更真实、资金更透明</li>
+              <li>预算和费用控制更前置</li>
+              <li>财务从后台走向经营前线</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="conclusion">
+        <div class="c-label">年度规划核心主线</div>
+        <ul class="c-steps">
+          <li><span class="badge">V5</span><span>先提效 · 减少手工 · 统一口径</span></li>
+          <li><span class="badge">V6</span><span>再控险 · 资金透明 · 利润真实</span></li>
+          <li><span class="badge">V7</span><span>最后赋能 · 预算前置 · 经营监控</span></li>
+        </ul>
+        <div class="c-final">先解决最痛的 → 再堵最危险的 → 最后做最值钱的</div>
+      </div>
+    </div>
+
+    <!-- ══ 菜单规划区块 ══ -->
+    <div class="menu-section">
+      <div class="menu-section-title">📋 菜单规划全景 · 已有 + 分期新增</div>
+      <div class="menu-section-sub">点击版本按钮可切换显示/隐藏该期新增菜单，默认全部展示</div>
+
+      <!-- 图例 + 切换按钮 -->
+      <div class="legend">
+        <div class="legend-item">
+          <div class="leg-dot leg-existing"></div>
+          <span>已有（V1.0 - V4.0）</span>
+        </div>
+
+        <button class="toggle-btn btn-v5" id="btn-v5" onclick="togglePhase('v5')">
+          <span class="btn-dot"></span>
+          V5.0 新增 · 财务提效
+          <span class="btn-status">已显示</span>
+        </button>
+
+        <button class="toggle-btn btn-v6" id="btn-v6" onclick="togglePhase('v6')">
+          <span class="btn-dot"></span>
+          V6.0 新增 · 资金风控
+          <span class="btn-status">已显示</span>
+        </button>
+
+        <button class="toggle-btn btn-v7" id="btn-v7" onclick="togglePhase('v7')">
+          <span class="btn-dot"></span>
+          V7.0 新增 · 预算经营
+          <span class="btn-status">已显示</span>
+        </button>
+      </div>
+
+      <!-- 菜单主体 -->
+      <div class="menu-grid">
+
+        <!-- 看板 -->
+        <div class="menu-col">
+          <div class="menu-col-header">看板</div>
+          <div class="menu-col-sub">老板 / 财务 / 财务 leader<br>各渠道销售及 leader</div>
+          <div class="menu-items">
+            <div class="menu-tag t-existing">全渠道经营看板</div>
+            <div class="menu-tag t-v5 phase-v5">业财一致性看板</div>
+            <div class="menu-tag t-v7 phase-v7">每日经营监控驾驶舱</div>
+            <div class="menu-tag t-v7 phase-v7">预算执行监控看板</div>
+          </div>
+        </div>
+
+        <!-- 报表 -->
+        <div class="menu-col">
+          <div class="menu-col-header">报表</div>
+          <div class="menu-col-sub">老板 / 财务及 leader<br>各渠道销售及 leader</div>
+          <div class="menu-items">
+            <div class="menu-tag t-existing">全渠道经营报表</div>
+            <div class="menu-tag t-existing">亚马逊利润报表</div>
+            <div class="menu-tag t-existing">自营利润报表</div>
+            <div class="menu-tag t-existing">tiktok利润报表</div>
+            <div class="menu-tag t-existing">分销利润报表</div>
+            <div class="menu-tag t-existing">商超利润报表</div>
+            <div class="menu-tag t-existing">国内渠道利润报表</div>
+            <div class="menu-tag t-v5 phase-v5">全渠道深入利润表</div>
+            <div class="menu-tag t-v5 phase-v5">渠道退货率追溯报表</div>
+            <div class="menu-tag t-v6 phase-v6">应收账龄分析表</div>
+            <div class="menu-tag t-v7 phase-v7">预算 vs 实际差异分析</div>
+          </div>
+        </div>
+
+        <!-- 数据源 -->
+        <div class="menu-col">
+          <div class="menu-col-header">数据源</div>
+          <div class="menu-col-sub">销售财务 / 成本会计</div>
+          <div class="menu-items">
+            <div class="menu-sub-grp">FBA 报告</div>
+            <div class="menu-tag t-existing">交易明细报告</div>
+            <div class="menu-tag t-existing">发货报告</div>
+            <div class="menu-tag t-existing">退货报告</div>
+            <div class="menu-tag t-existing">广告报告</div>
+            <div class="menu-tag t-existing">仓储报告</div>
+            <div class="menu-tag t-existing">进销存汇总表</div>
+            <div class="menu-tag t-existing">进销存明细表</div>
+            <div class="menu-sub-grp">第三方账单</div>
+            <div class="menu-tag t-existing">收单账单</div>
+            <div class="menu-tag t-existing">海外仓账单</div>
+            <div class="menu-tag t-existing">TikTok结算报告</div>
+            <div class="menu-tag t-existing">国内渠道账单</div>
+            <div class="menu-tag t-v6 phase-v6">PayPal / 三方支付流水</div>
+          </div>
+        </div>
+
+        <!-- 台账 -->
+        <div class="menu-col">
+          <div class="menu-col-header">台账</div>
+          <div class="menu-col-sub">销售财务</div>
+          <div class="menu-items">
+            <div class="menu-sub-grp">物流</div>
+            <div class="menu-tag t-existing">月度头程成本</div>
+            <div class="menu-tag t-v5 phase-v5">营销推广费用台账</div>
+            <div class="menu-sub-grp">亚马逊</div>
+            <div class="menu-tag t-existing">月费用项差异</div>
+            <div class="menu-tag t-existing">月进销存差异</div>
+            <div class="menu-tag t-existing">月销售数量差异</div>
+            <div class="menu-sub-grp">退货退款</div>
+            <div class="menu-tag t-existing">自营退货数据</div>
+            <div class="menu-tag t-existing">TikTok退款数据</div>
+            <div class="menu-tag t-existing">国内渠道退货数据</div>
+            <div class="menu-sub-grp">凭证</div>
+            <div class="menu-tag t-existing">凭证预览列表</div>
+            <div class="menu-tag t-v6 phase-v6">暂估 / 计提 / 冲回台账</div>
+            <div class="menu-tag t-v6 phase-v6">资金核销对账台账</div>
+            <div class="menu-tag t-v6 phase-v6">海外资金池台账</div>
+          </div>
+        </div>
+
+        <!-- 单据 -->
+        <div class="menu-col">
+          <div class="menu-col-header">单据</div>
+          <div class="menu-col-sub">销售财务</div>
+          <div class="menu-items">
+            <div class="menu-sub-grp">运营</div>
+            <div class="menu-tag t-existing">货件接收明细</div>
+            <div class="menu-tag t-existing">站外费用管理</div>
+            <div class="menu-tag t-existing">推送金蝶记录</div>
+            <div class="menu-tag t-existing">推送凭证管理</div>
+            <div class="menu-tag t-v5 phase-v5">业财差异复核单</div>
+            <div class="menu-sub-grp">金蝶</div>
+            <div class="menu-tag t-existing">金蝶单据明细</div>
+            <div class="menu-tag t-existing">月度收发明细</div>
+            <div class="menu-tag t-existing">金蝶销售出库明细</div>
+            <div class="menu-tag t-existing">金蝶销售退货明细</div>
+            <div class="menu-tag t-v7 phase-v7">预算执行差异单</div>
+          </div>
+        </div>
+
+        <!-- 工具 -->
+        <div class="menu-col">
+          <div class="menu-col-header">工具</div>
+          <div class="menu-col-sub">销售财务</div>
+          <div class="menu-items">
+            <div class="menu-sub-grp">亚马逊</div>
+            <div class="menu-tag t-existing">亚马逊报表导出</div>
+            <div class="menu-tag t-existing">亚马逊财务报告下载</div>
+            <div class="menu-tag t-existing">结算报告</div>
+            <div class="menu-sub-grp">系统</div>
+            <div class="menu-tag t-existing">导入导出任务</div>
+            <div class="menu-tag t-existing">异步任务列表</div>
+            <div class="menu-tag t-existing">多语言报表字段对照</div>
+            <div class="menu-tag t-v5 phase-v5">业财主数据映射配置</div>
+            <div class="menu-tag t-v5 phase-v5">费用分摊规则引擎</div>
+            <div class="menu-tag t-v7 phase-v7">预算限额管控配置</div>
+          </div>
+        </div>
+
+      </div><!-- /menu-grid -->
+    </div><!-- /menu-section -->
+
+    <!-- 脚注 -->
+    <div class="footer">
+      <span>财务产品经理 · 年度规划汇报材料 · v2.0</span>
+      <span>2025 · 内部讨论用</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 每个版本的状态
+  const state = { v5: true, v6: true, v7: true };
+
+  function togglePhase(phase) {
+    state[phase] = !state[phase];
+
+    // 更新按钮样式
+    const btn = document.getElementById('btn-' + phase);
+    const statusEl = btn.querySelector('.btn-status');
+    if (state[phase]) {
+      btn.classList.remove('off');
+      statusEl.textContent = '已显示';
+    } else {
+      btn.classList.add('off');
+      statusEl.textContent = '已隐藏';
+    }
+
+    // 获取所有该期菜单标签
+    const tags = document.querySelectorAll('.phase-' + phase);
+    tags.forEach(tag => {
+      if (state[phase]) {
+        // 展开
+        tag.classList.remove('hidden');
+      } else {
+        // 折叠
+        tag.classList.add('hidden');
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

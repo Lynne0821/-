@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>财务系统 - 跨境发货批次</title>
+  <style>
+    /* 全局基础重置 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 1920px;
+      min-height: 100vh;
+      margin: 0 auto;
+      font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      font-size: 13px;
+      display: flex;
+    }
+
+    /* 左侧极简黑条 (参考图一边缘) */
+    .sidebar {
+      width: 20px;
+      background-color: #202531;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 16px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+    .sidebar-icon {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-bottom: 12px;
+      background-color: #3875f6;
+      cursor: pointer;
+    }
+
+    /* 主内容区 */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #f5f6f8;
+    }
+
+    /* 顶部导航 */
+    .topnav {
+      height: 48px;
+      background-color: #3875f6;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 20px;
+    }
+    .nav-tabs {
+      display: flex;
+      height: 32px;
+    }
+    .nav-tab {
+      padding: 0 16px;
+      height: 32px;
+      line-height: 32px;
+      color: #b0c9ff;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      margin-right: 4px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+    }
+    .nav-tab:hover { color: #fff; }
+    .nav-tab.active { background-color: #fff; color: #3875f6; font-weight: 500; }
+    .nav-tab .close { margin-left: 10px; font-size: 14px; color: #999; }
+    .nav-tab.active .close:hover { color: #ff4d4f; }
+
+    .topnav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      color: #fff;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    .topnav-right > div {
+      margin-left: 24px;
+      display: flex;
+      align-items: center;
+    }
+    .avatar {
+      width: 20px;
+      height: 20px;
+      background-color: #fff;
+      color: #3875f6;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 20px;
+      font-size: 10px;
+      font-weight: bold;
+      margin-left: 4px;
+    }
+
+    /* 页面主体内容 */
+    .page-content {
+      padding: 16px 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* 搜索区域 (图一风格精简) */
+    .search-area {
+      background-color: #fff;
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .search-left {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .search-item {
+      display: flex;
+      align-items: center;
+    }
+    .search-item label {
+      margin-right: 8px;
+      color: #606266;
+    }
+    .search-item input, .search-item select {
+      height: 32px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      padding: 0 8px;
+      outline: none;
+      font-size: 13px;
+      color: #333;
+      width: 140px;
+    }
+    .search-item input.wide { width: 300px; }
+    
+    .search-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* 按钮样式 */
+    .btn {
+      height: 32px;
+      line-height: 30px;
+      padding: 0 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      border: 1px solid transparent;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background-color: #3875f6; color: #fff; border-color: #3875f6; }
+    .btn-primary:hover { background-color: #2b61d6; }
+    .btn-default { background-color: #fff; color: #606266; border-color: #dcdfe6; }
+    .btn-default:hover { border-color: #3875f6; color: #3875f6; }
+
+    /* 操作按钮区 (右侧) */
+    .action-area {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    /* 表格区域 */
+    .table-wrapper {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      overflow: hidden;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      min-width: 1500px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 12px 8px;
+      border-bottom: 1px solid #ebeef5;
+      color: #303133;
+      vertical-align: middle;
+    }
+    th {
+      background-color: #fcfcfc;
+      color: #606266;
+      font-weight: bold;
+    }
+    tbody tr:hover { background-color: #f5f7fa; }
+    .td-link { color: #3875f6; cursor: pointer; }
+    .td-link:hover { text-decoration: underline; }
+    
+    /* 异常节点标识样式 */
+    .status-error {
+      background-color: #fff1f0;
+      color: #cf1322;
+      border: 1px solid #ffa39e;
+      border-radius: 4px;
+      padding: 4px;
+      display: inline-block;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .theory-time {
+      color: #999;
+      font-size: 12px;
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* 底部分页 */
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px;
+      background: #fff;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #ebeef5;
+    }
+    .page-btn {
+      min-width: 28px;
+      height: 28px;
+      padding: 0 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #fff;
+      color: #606266;
+    }
+    .page-btn.active { background-color: #3875f6; color: #fff; border-color: #3875f6; }
+
+    /* ================= 异常上报弹窗样式 ================= */
+    .modal-overlay {
+      display: none; /* 默认隐藏 */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 4px;
+      width: 480px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #ebeef5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .modal-close {
+      cursor: pointer;
+      color: #909399;
+      font-size: 18px;
+    }
+    .modal-close:hover {
+      color: #333;
+    }
+    .modal-body {
+      padding: 24px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #ebeef5;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+    /* 表单项 */
+    .form-item {
+      display: flex;
+      margin-bottom: 16px;
+      align-items: flex-start;
+    }
+    .form-label {
+      width: 120px;
+      text-align: right;
+      margin-right: 16px;
+      line-height: 32px;
+      color: #606266;
+    }
+    .form-label::before {
+      content: '*';
+      color: #f56c6c;
+      margin-right: 4px;
+    }
+    .form-content {
+      flex: 1;
+    }
+    .form-content input[type="text"],
+    .form-content input[type="date"],
+    .form-content select,
+    .form-content textarea {
+      width: 100%;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      padding: 0 12px;
+      outline: none;
+      font-family: inherit;
+      color: #606266;
+      transition: border-color 0.2s;
+    }
+    .form-content input,
+    .form-content select {
+      height: 32px;
+    }
+    .form-content textarea {
+      padding: 8px 12px;
+      height: 64px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .form-content input:focus,
+    .form-content select:focus,
+    .form-content textarea:focus {
+      border-color: #3875f6;
+    }
+    .form-content input::placeholder,
+    .form-content textarea::placeholder {
+      color: #c0c4cc;
+    }
+    .mb-8 {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 左侧窄条 -->
+  <div class="sidebar">
+    <div class="sidebar-icon" style="background:transparent; border:1px solid #8c92a4; margin-top:4px;"></div>
+    <div class="sidebar-icon"></div>
+    <div class="sidebar-icon" style="background:transparent; border:1px solid #8c92a4; border-radius:50%"></div>
+  </div>
+
+  <!-- 主内容区 -->
+  <div class="main">
+    
+    <!-- 顶部导航 (精简) -->
+    <div class="topnav">
+      <div class="nav-tabs">
+        <div class="nav-tab">首页</div>
+        <div class="nav-tab">物流计划管理</div>
+        <div class="nav-tab">报关单管理</div>
+        <div class="nav-tab active">DL跨境发货批次 <span class="close">×</span></div>
+        <div class="nav-tab">DL租金账单</div>
+        <div class="nav-tab">清关单管理</div>
+      </div>
+      <div class="topnav-right">
+        <div>项目平台 ▾</div>
+        <div style="margin-left:16px;">发货系统 ▾</div>
+        <div style="margin-left:16px;">
+          欢迎<span class="avatar">JU</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      
+      <!-- 搜索表单区 -->
+      <div class="search-area">
+        <div class="search-left">
+          <div class="search-item">
+            <label>承运商</label>
+            <select><option>请选择</option></select>
+          </div>
+          <div class="search-item">
+            <label>目的国</label>
+            <select><option>请选择</option></select>
+          </div>
+          <div class="search-item">
+            <label>运输方式</label>
+            <select><option>请选择</option></select>
+          </div>
+          <div class="search-item">
+            <label>批次号</label>
+            <input type="text" class="wide" placeholder="批量查询以逗号、空格或换行隔开">
+          </div>
+        </div>
+        <div class="search-right">
+          <button class="btn btn-primary">查询</button>
+          <button class="btn btn-default">重置</button>
+        </div>
+      </div>
+
+      <!-- 操作按钮区 -->
+      <div class="action-area">
+        <button class="btn btn-default">导出DL明细</button>
+        <button class="btn btn-primary">导入物流追踪轨迹</button>
+      </div>
+
+      <!-- 数据表格区 -->
+      <div class="table-wrapper">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;"><input type="checkbox"></th>
+              <th>DL号</th>
+              <th>目的国</th>
+              <th>运输方式</th>
+              <th>截单(系统)</th>
+              <th>提货(系统)</th>
+              <th>出口报关放行</th>
+              <th>开船/起飞</th>
+              <th>到港/落地</th>
+              <th>清关放行</th>
+              <th>提柜</th>
+              <th>派送/签收</th>
+              <th>上架</th>
+              <th>操作</th> <!-- 新增操作列 -->
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 行内配置 data-raw 存储后端返回的实际业务数据，由 JS 动态计算渲染 -->
+            <!-- 正常流转演示 -->
+            <tr data-country="US" data-transport="普船" data-raw='{"cut":"2026-04-10", "pickup":"2026-04-12", "export":"2026-04-14", "depart":"2026-04-16", "arrive":"2026-05-02", "clearance":"2026-05-03", "pull":"2026-05-08", "deliver":"2026-05-14", "shelf":"2026-05-16"}'>
+              <td style="text-align: center;"><input type="checkbox"></td>
+              <td class="td-link">DL202604200092</td>
+              <td>美国</td>
+              <td>普船</td>
+              <!-- 后面单元格由 JS 填充 -->
+            </tr>
+            <!-- 演示异常：提货正常，但开船起飞时间晚于理论时间，且后续节点缺失 -->
+            <tr data-country="US" data-transport="普船" data-raw='{"cut":"2026-04-11", "pickup":"2026-04-14", "export":"2026-04-17", "depart":"2026-04-25", "arrive":"", "clearance":"", "pull":"", "deliver":"", "shelf":""}'>
+              <td style="text-align: center;"><input type="checkbox"></td>
+              <td class="td-link">DL202604200093</td>
+              <td>美国</td>
+              <td>普船</td>
+            </tr>
+            <!-- 演示异常：目前未到港，但按照理论时间应该已经到港了（模拟当前时间 05-18） -->
+            <tr data-country="US" data-transport="普船" data-raw='{"cut":"2026-04-12", "pickup":"2026-04-18", "export":"2026-04-20", "depart":"2026-04-22", "arrive":"", "clearance":"", "pull":"", "deliver":"", "shelf":""}'>
+              <td style="text-align: center;"><input type="checkbox"></td>
+              <td class="td-link">DL202604200094</td>
+              <td>美国</td>
+              <td>普船</td>
+            </tr>
+            <!-- 正常进行中：还未到港，且理论时间未超时 -->
+            <tr data-country="US" data-transport="普船" data-raw='{"cut":"2026-04-28", "pickup":"2026-05-02", "export":"2026-05-04", "depart":"2026-05-07", "arrive":"", "clearance":"", "pull":"", "deliver":"", "shelf":""}'>
+              <td style="text-align: center;"><input type="checkbox"></td>
+              <td class="td-link">DL202604200095</td>
+              <td>美国</td>
+              <td>普船</td>
+            </tr>
+            <!-- 演示异常：各项数据维护混乱，派送签收极度延迟 -->
+            <tr data-country="US" data-transport="普船" data-raw='{"cut":"2026-04-01", "pickup":"2026-04-08", "export":"2026-04-10", "depart":"2026-04-13", "arrive":"2026-04-28", "clearance":"2026-04-29", "pull":"2026-05-04", "deliver":"2026-05-18", "shelf":""}'>
+              <td style="text-align: center;"><input type="checkbox"></td>
+              <td class="td-link">DL202604200096</td>
+              <td>美国</td>
+              <td>普船</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- 底部分页 -->
+        <div class="pagination">
+          <span style="color: #606266;">共 32506 条</span>
+          <select style="height: 28px; border: 1px solid #dcdfe6; border-radius: 4px; outline: none; color:#606266;">
+            <option>100条/页</option>
+          </select>
+          <div class="page-btn">&lt;</div>
+          <div class="page-btn active">1</div>
+          <div class="page-btn">2</div>
+          <div class="page-btn">3</div>
+          <div class="page-btn">4</div>
+          <span style="color: #c0c4cc; margin: 0 4px;">...</span>
+          <div class="page-btn">326</div>
+          <div class="page-btn">&gt;</div>
+          <span style="color: #606266;">前往</span>
+          <input type="text" value="1" style="width: 48px; height: 28px; text-align: center; border: 1px solid #dcdfe6; border-radius: 4px;">
+          <span style="color: #606266;">页</span>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- 异常上报弹窗 -->
+  <div class="modal-overlay" id="reportModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span>异常上报</span>
+        <span class="modal-close" onclick="closeModal()">×</span>
+      </div>
+      <div class="modal-body">
+        
+        <div class="form-item">
+          <label class="form-label">预计送达时间</label>
+          <div class="form-content">
+            <input type="date" placeholder="预计送达时间">
+          </div>
+        </div>
+        
+        <div class="form-item">
+          <label class="form-label">预计异常解除时间</label>
+          <div class="form-content">
+            <input type="date" placeholder="预计异常解除时间">
+          </div>
+        </div>
+
+        <div class="form-item">
+          <label class="form-label">异常节点</label>
+          <div class="form-content">
+            <select>
+              <option value="">异常节点</option>
+              <option value="提货">提货</option>
+              <option value="出口报关放行">出口报关放行</option>
+              <option value="开船/起飞">开船/起飞</option>
+              <option value="到港/落地">到港/落地</option>
+              <option value="清关放行">清关放行</option>
+              <option value="提柜">提柜</option>
+              <option value="派送/签收">派送/签收</option>
+              <option value="上架">上架</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <label class="form-label">异常类型</label>
+          <div class="form-content">
+            <select class="mb-8">
+              <option value="">异常类型</option>
+              <option value="海关查验">海关查验</option>
+              <option value="天气原因">天气原因</option>
+              <option value="港口拥堵">港口拥堵</option>
+              <option value="其他">其他</option>
+            </select>
+            <input type="text" placeholder="其他异常类型">
+          </div>
+        </div>
+
+        <div class="form-item">
+          <label class="form-label">异常等级</label>
+          <div class="form-content">
+            <select>
+              <option value="">异常等级</option>
+              <option value="P0">严重 (P0)</option>
+              <option value="P1">高 (P1)</option>
+              <option value="P2">中 (P2)</option>
+              <option value="P3">低 (P3)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <label class="form-label">异常原因</label>
+          <div class="form-content">
+            <textarea placeholder="异常原因"></textarea>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <label class="form-label">异常进展</label>
+          <div class="form-content">
+            <textarea placeholder="异常进展"></textarea>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <label class="form-label">解决方案</label>
+          <div class="form-content">
+            <textarea placeholder="解决方案"></textarea>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" style="width: 80px; text-align: center;" onclick="closeModal()">关闭</button>
+        <button class="btn btn-primary" style="width: 80px; text-align: center;" onclick="saveModal()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 模拟当前时间，用于判断未填写的节点是否已经超时
+    const SIMULATED_TODAY = new Date('2026-05-18').getTime();
+
+    // 根据图二提取的【US-普船】节点间隔规则（天数）
+    const RULES = {
+      "US_普船": [
+        { key: "cut", offset: 0, name: "截单" },          // 起点基准
+        { key: "pickup", offset: 7, name: "提货" },         // 截单后7天
+        { key: "export", offset: 3, name: "出口报关放行" },  // 提货后3天
+        { key: "depart", offset: 3, name: "开船/起飞" },    // 报关后3天
+        { key: "arrive", offset: 16, name: "到港/落地" },   // 开船后16天
+        { key: "clearance", offset: 1, name: "清关放行" },   // 到港后1天
+        { key: "pull", offset: 6, name: "提柜" },          // 清关后6天
+        { key: "deliver", offset: 7, name: "派送/签收" },    // 提柜后7天
+        { key: "shelf", offset: 3, name: "上架" }           // 派送后3天
+      ]
+    };
+
+    // 辅助函数：给日期加 N 天
+    function addDays(dateStr, days) {
+      if(!dateStr) return "";
+      const d = new Date(dateStr);
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+
+    // 渲染表格数据
+    document.querySelectorAll('#dataTable tbody tr').forEach(tr => {
+      const ruleKey = "US_普船"; // 示例写死判断美国普船
+      const rawData = JSON.parse(tr.getAttribute('data-raw'));
+      const ruleChain = RULES[ruleKey];
+      
+      let theoryDateMap = {}; // 存储每个节点的理论日期
+      let currentDate = rawData.cut; 
+      theoryDateMap.cut = currentDate; // 截单为起点
+
+      // 顺次计算理论时间
+      for(let i=1; i<ruleChain.length; i++) {
+        const step = ruleChain[i];
+        if(currentDate) {
+          currentDate = addDays(currentDate, step.offset);
+          theoryDateMap[step.key] = currentDate;
+        }
+      }
+
+      // 生成 DOM
+      ruleChain.forEach(step => {
+        const td = document.createElement('td');
+        const actualVal = rawData[step.key];
+        const theoryVal = theoryDateMap[step.key];
+
+        if (step.key === "cut") {
+          td.textContent = actualVal; // 截单作为起点不标异常
+        } else {
+          let isError = false;
+          
+          if (actualVal) {
+            // 情况1：有实际时间，但晚于理论时间
+            if (theoryVal && new Date(actualVal).getTime() > new Date(theoryVal).getTime()) {
+              isError = true;
+            }
+          } else {
+            // 情况2：无实际时间（未维护），但当前时间已经超出了理论时间
+            if (theoryVal && SIMULATED_TODAY > new Date(theoryVal).getTime()) {
+              isError = true;
+            }
+          }
+
+          if (isError) {
+            td.innerHTML = `
+              <div class="status-error">
+                <div>${actualVal ? actualVal : '未维护'}</div>
+                <div class="theory-time">理论应: ${theoryVal}</div>
+              </div>
+            `;
+          } else {
+            // 正常显示
+            td.innerHTML = `
+              <div>${actualVal ? actualVal : '-'}</div>
+              ${theoryVal && !actualVal ? `<div class="theory-time">预计: ${theoryVal}</div>` : ''}
+            `;
+          }
+        }
+        tr.appendChild(td);
+      });
+
+      // 新增操作列
+      const tdAction = document.createElement('td');
+      tdAction.innerHTML = '<span class="td-link" onclick="openModal()">异常上报</span>';
+      tr.appendChild(tdAction);
+    });
+
+    // 弹窗相关逻辑
+    const modal = document.getElementById('reportModal');
+
+    function openModal() {
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    function saveModal() {
+      alert("保存成功！");
+      closeModal();
+    }
+
+    // 点击弹窗外部也可关闭
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+  </script>
+</body>
+</html>
