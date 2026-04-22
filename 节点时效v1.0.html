@@ -127,6 +127,7 @@
       display: flex;
       gap: 24px;
       align-items: center;
+      flex-wrap: wrap;
     }
     .search-item {
       display: flex;
@@ -188,7 +189,7 @@
     }
     table {
       width: 100%;
-      min-width: 1500px;
+      min-width: 1650px;
       border-collapse: collapse;
       text-align: left;
     }
@@ -418,6 +419,22 @@
             <label>批次号</label>
             <input type="text" class="wide" placeholder="批量查询以逗号、空格或换行隔开">
           </div>
+          <div class="search-item">
+            <label>附件资料</label>
+            <select style="width: 100px; margin-right: 8px;">
+              <option>全部类型</option>
+              <option>运输提单</option>
+              <option>报关底单</option>
+              <option>税金单</option>
+              <option>POD</option>
+              <option>其他</option>
+            </select>
+            <select style="width: 100px;">
+              <option>上传状态</option>
+              <option>已上传</option>
+              <option>未上传</option>
+            </select>
+          </div>
         </div>
         <div class="search-right">
           <button class="btn btn-primary">查询</button>
@@ -448,6 +465,7 @@
               <th>清关放行</th>
               <th>提柜</th>
               <th>派送/签收</th>
+              <th>附件资料</th>
               <th>操作</th> <!-- 新增操作列 -->
             </tr>
           </thead>
@@ -725,6 +743,28 @@
         }
         tr.appendChild(td);
       });
+
+      // 新增附件资料列
+      const tdAttachment = document.createElement('td');
+      const docTypes = ['运输提单', '报关底单', '税金单', 'POD', '其他'];
+      let docsHtml = '<div style="display:flex; flex-wrap:wrap; gap:8px; width: 180px;">';
+      docTypes.forEach(doc => {
+        // 模拟附件数据，仅做演示用
+        let isUploaded = false;
+        if (doc === '运输提单' && rawData.depart) isUploaded = true;
+        if (doc === '报关底单' && rawData.export) isUploaded = true;
+        if (doc === 'POD' && rawData.deliver) isUploaded = true;
+        if (doc === '税金单' && rawData.clearance) isUploaded = true;
+
+        if (isUploaded) {
+          docsHtml += `<span class="td-link" style="font-size:12px; display:inline-flex; align-items:center;" title="点击下载" onclick="alert('下载 ${doc}')"><span style="margin-right:2px; font-size:14px;">📎</span>${doc}</span>`;
+        } else {
+          docsHtml += `<span style="color:#c0c4cc; font-size:12px; display:inline-flex; align-items:center;">${doc}</span>`;
+        }
+      });
+      docsHtml += '</div>';
+      tdAttachment.innerHTML = docsHtml;
+      tr.appendChild(tdAttachment);
 
       // 新增操作列
       const tdAction = document.createElement('td');
