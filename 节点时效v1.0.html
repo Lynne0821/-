@@ -420,7 +420,8 @@
             <select style="width: 100px; margin-right: 8px;">
               <option>附件资料</option>
               <option>运输提单</option>
-              <option>报关底单</option>
+              <option>报关放行条</option>
+              <option>退税提单</option>
               <option>税金单</option>
               <option>POD</option>
               <option>其他</option>
@@ -767,14 +768,15 @@
 
       // 新增附件资料列
       const tdAttachment = document.createElement('td');
-      const docTypes = ['运输提单', '报关底单', '税金单', 'POD', '其他'];
+      const docTypes = ['运输提单', '报关放行条', '退税提单', '税金单', 'POD', '其他'];
       const fileIconSvg = `<svg viewBox="64 64 896 896" width="14" height="14" fill="#ff4d4f" style="cursor:pointer; vertical-align:middle; margin-left:6px;"><path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326z m1.8 562H232V136h302v216a42 42 0 0 0 42 42h216v494zM504 618H320v64h184v-64z m184-128H320v64h368v-64z m-184 256H320v64h184v-64z"></path></svg>`;
       let docsHtml = '<div style="display:flex; flex-direction:column; gap:12px; width: 140px; color: #606266; font-size: 13px;">';
       docTypes.forEach(doc => {
         // 模拟附件数据，仅做演示用
         let isUploaded = false;
         if (doc === '运输提单' && rawData.depart) isUploaded = true;
-        if (doc === '报关底单' && rawData.export) isUploaded = true;
+        if (doc === '报关放行条' && rawData.export) isUploaded = true;
+        if (doc === '退税提单' && rawData.export) isUploaded = true;
         if (doc === 'POD' && rawData.deliver) isUploaded = true;
         if (doc === '税金单' && rawData.clearance) isUploaded = true;
 
