@@ -709,6 +709,7 @@
       ruleChain.forEach(step => {
         if (step.key === "cut" || step.key === "shelf") return;
         const td = document.createElement('td');
+        td.style.position = 'relative'; // 为绝对定位的弹窗提供参考
         const actualVal = rawData[step.key];
         const theoryVal = theoryDateMap[step.key];
 
@@ -727,8 +728,22 @@
         }
 
         let editIconHtml = '';
+        let popoverHtml = '';
         if (['depart', 'arrive', 'clearance', 'pull', 'deliver'].includes(step.key)) {
-          editIconHtml = `<svg viewBox="64 64 896 896" width="14" height="14" fill="#3875f6" style="cursor:pointer; vertical-align:middle; margin-left:6px; flex-shrink:0;" title="编辑${step.name}" onclick="alert('进入编辑：${step.name}')"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9z m67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg>`;
+          editIconHtml = `<svg viewBox="64 64 896 896" width="14" height="14" fill="#3875f6" style="cursor:pointer; vertical-align:middle; margin-left:6px; flex-shrink:0;" title="编辑${step.name}" onclick="openInlineEdit(this)"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9z m67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg>`;
+          
+          popoverHtml = `
+            <div class="inline-edit-popover" style="position:absolute; background:#fff; border:1px solid #ebeef5; box-shadow:0 2px 12px 0 rgba(0,0,0,.1); border-radius:4px; padding:12px; z-index:100; display:none; flex-direction:column; gap:12px; top: 100%; left: 0; min-width: 180px;">
+              <div style="display:flex; align-items:center;">
+                <span style="margin-right:8px; color:#606266; font-size:13px; white-space:nowrap;">${step.name}:</span>
+                <input type="date" class="edit-date-input" value="${actualVal || ''}" style="flex:1; height:28px; border:1px solid #dcdfe6; border-radius:4px; padding:0 8px; outline:none; color:#606266; font-size:13px;">
+              </div>
+              <div style="display:flex; justify-content:center; gap:8px;">
+                <button class="btn btn-default" style="height:26px; padding:0 16px; line-height:24px; font-size:12px;" onclick="cancelInlineEdit(this)">取消</button>
+                <button class="btn btn-primary" style="height:26px; padding:0 16px; line-height:24px; font-size:12px;" onclick="saveInlineEdit(this)">保存</button>
+              </div>
+            </div>
+          `;
         }
 
         if (isError) {
@@ -737,12 +752,14 @@
               <div style="display:flex; align-items:center;">${actualVal ? actualVal : '未维护'}${editIconHtml}</div>
               <div class="theory-time">理论应: ${theoryVal}</div>
             </div>
+            ${popoverHtml}
           `;
         } else {
           // 正常显示
           td.innerHTML = `
             <div style="display:flex; align-items:center;">${actualVal ? actualVal : '-'}${editIconHtml}</div>
             ${theoryVal && !actualVal ? `<div class="theory-time">预计: ${theoryVal}</div>` : ''}
+            ${popoverHtml}
           `;
         }
         tr.appendChild(td);
@@ -817,6 +834,45 @@
     uploadModal.addEventListener('click', function(e) {
       if (e.target === uploadModal) {
         closeUploadModal();
+      }
+    });
+
+    // 单元格内联编辑交互逻辑
+    function openInlineEdit(iconEl) {
+      // 关闭其他可能打开的 popover
+      document.querySelectorAll('.inline-edit-popover').forEach(el => el.style.display = 'none');
+      const td = iconEl.closest('td');
+      const popover = td.querySelector('.inline-edit-popover');
+      if (popover) {
+        popover.style.display = 'flex';
+      }
+      // 阻止冒泡
+      event.stopPropagation();
+    }
+
+    function cancelInlineEdit(btnEl) {
+      const popover = btnEl.closest('.inline-edit-popover');
+      if (popover) {
+        popover.style.display = 'none';
+      }
+      event.stopPropagation();
+    }
+
+    function saveInlineEdit(btnEl) {
+      const popover = btnEl.closest('.inline-edit-popover');
+      if (popover) {
+        const input = popover.querySelector('.edit-date-input');
+        const newVal = input.value;
+        alert('前端演示：已保存日期 ' + (newVal || '空'));
+        popover.style.display = 'none';
+      }
+      event.stopPropagation();
+    }
+
+    // 点击页面空白处关闭所有内联弹窗
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.inline-edit-popover') && !e.target.closest('svg')) {
+        document.querySelectorAll('.inline-edit-popover').forEach(el => el.style.display = 'none');
       }
     });
 
